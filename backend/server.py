@@ -120,7 +120,8 @@ async def root():
     }
 
 
-# Include API router
+# Include routers
+app.include_router(auth_router)
 app.include_router(api_router)
 
 # Setup CORS
