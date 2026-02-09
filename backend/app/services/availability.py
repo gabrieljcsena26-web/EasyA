@@ -266,12 +266,12 @@ class AvailabilityEngine:
         # Check overlap with breaks
         for break_start, break_end in breaks:
             if self._overlaps(slot_start, slot_end, break_start, break_end):
-                return False, break
+                return False, "break"
         
         # Check overlap with existing appointments
         for apt_start, apt_end in appointments:
             if self._overlaps(slot_start, slot_end, apt_start, apt_end):
-                return False, booked
+                return False, "booked"
         
         return True, None
     
