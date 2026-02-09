@@ -147,7 +147,7 @@ def get_availability(
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=\"Invalid date format. Use YYYY-MM-DD\"
+            detail=Invalid date format. Use YYYY-MM-DD
         )
     
     # Initialize availability engine
@@ -176,11 +176,11 @@ def get_availability(
     available_count = sum(1 for slot in slots if slot['available'])
     
     return {
-        \"date\": date,
-        \"slots\": slots,
-        \"total_slots\": len(slots),
-        \"available_slots\": available_count,
-        \"has_availability\": available_count > 0
+        date: date,
+        slots: slots,
+        total_slots: len(slots),
+        available_slots: available_count,
+        has_availability: available_count > 0
     }
 
 
@@ -202,7 +202,7 @@ def get_availability_summary(
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=\"Invalid date format. Use YYYY-MM-DD\"
+            detail=Invalid date format. Use YYYY-MM-DD
         )
     
     # Initialize availability engine
@@ -229,9 +229,9 @@ def get_availability_summary(
         )
     
     return {
-        \"start_date\": start_date,
-        \"days\": days,
-        \"summary\": summary
+        start_date: start_date,
+        days: days,
+        summary: summary
     }
 
 
@@ -258,7 +258,7 @@ def create_booking(
     if not establishment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=\"Establishment not found\"
+            detail=Establishment not found
         )
     
     # Check trial status
@@ -267,8 +267,8 @@ def create_booking(
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
             detail={
-                \"code\": \"TRIAL_EXPIRED\",
-                \"message\": \"Booking is currently unavailable. Please try again later.\"
+                code: TRIAL_EXPIRED,
+                message: Booking is currently unavailable. Please try again later.
             }
         )
     
@@ -277,7 +277,7 @@ def create_booking(
     if not service:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=\"Service not found\"
+            detail=Service not found
         )
     
     professional = db.query(Professional).filter(
@@ -286,7 +286,7 @@ def create_booking(
     if not professional:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=\"Professional not found\"
+            detail=Professional not found
         )
     
     # Calculate end time
@@ -315,8 +315,8 @@ def create_booking(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail={
-                \"code\": \"SLOT_UNAVAILABLE\",
-                \"message\": \"This time slot is no longer available. Please choose another.\"
+                code: SLOT_UNAVAILABLE,
+                message: This time slot is no longer available. Please choose another.
             }
         )
     
@@ -343,7 +343,7 @@ def create_booking(
         db.flush()
     
     # Create appointment with idempotency key
-    idempotency_key = f\"{establishment_id}:{booking.customer_phone}:{booking.start_time.isoformat()}\"
+    idempotency_key = f{establishment_id}:{booking.customer_phone}:{booking.start_time.isoformat()}
     
     # Check if already exists (idempotency)
     existing = db.query(Appointment).filter(
@@ -351,10 +351,10 @@ def create_booking(
     ).first()
     
     if existing:
-        logger.info(f\"Duplicate booking attempt detected: {idempotency_key}\")\n        return {
-            \"message\": \"Appointment already created\",
-            \"appointment\": existing,
-            \"duplicate\": True
+        logger.info(fDuplicate booking attempt detected: {idempotency_key})\n        return {
+            message: Appointment already created,
+            appointment: existing,
+            duplicate: True
         }
     
     # Create appointment
@@ -382,23 +382,23 @@ def create_booking(
     db.commit()
     db.refresh(appointment)
     
-    logger.info(f\"Appointment created: {appointment.id} for {booking.customer_name}\")\n    
+    logger.info(fAppointment created: {appointment.id} for {booking.customer_name})\n    
     # TODO: Schedule confirmation notifications via Celery
     
     return {
-        \"message\": \"Appointment confirmed successfully!\",
-        \"appointment\": {
-            \"id\": appointment.id,
-            \"service\": service.name,
-            \"professional\": professional.name,
-            \"start_time\": appointment.start_time.isoformat(),
-            \"end_time\": appointment.end_time.isoformat(),
-            \"confirmation_token\": appointment.confirmation_token,
+        message: Appointment confirmed successfully!,
+        appointment: {
+            id: appointment.id,
+            service: service.name,
+            professional: professional.name,
+            start_time: appointment.start_time.isoformat(),
+            end_time: appointment.end_time.isoformat(),
+            confirmation_token: appointment.confirmation_token,
         },
-        \"actions\": {
-            \"calendar_download\": f\"/api/appointments/{appointment.id}/calendar.ics?token={appointment.confirmation_token}\",
-            \"cancel\": f\"/api/appointments/{appointment.id}/cancel?token={appointment.confirmation_token}\",
-            \"reschedule\": f\"/api/appointments/{appointment.id}/reschedule?token={appointment.confirmation_token}\"
+        actions: {
+            calendar_download: f/api/appointments/{appointment.id}/calendar.ics?token={appointment.confirmation_token},
+            cancel: f/api/appointments/{appointment.id}/cancel?token={appointment.confirmation_token},
+            reschedule: f/api/appointments/{appointment.id}/reschedule?token={appointment.confirmation_token}
         }
     }
 
@@ -409,7 +409,7 @@ def cancel_appointment(
     token: str,
     db: Session = Depends(get_db)
 ):
-    \"\"\"Cancel appointment (customer self-service).\"\"\"
+    Cancel appointment (customer self-service).
     appointment = db.query(Appointment).filter(
         and_(
             Appointment.id == appointment_id,
@@ -420,22 +420,22 @@ def cancel_appointment(
     if not appointment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=\"Appointment not found or invalid token\"
+            detail=Appointment not found or invalid token
         )
     
     if appointment.status == AppointmentStatus.CANCELLED:
-        return {\"message\": \"Appointment already cancelled\"}
+        return {message: Appointment already cancelled}
     
     appointment.status = AppointmentStatus.CANCELLED
     appointment.updated_at = utcnow()
     
     db.commit()
     
-    logger.info(f\"Appointment cancelled by customer: {appointment_id}\")
+    logger.info(fAppointment cancelled by customer: {appointment_id})
     
     # TODO: Send cancellation notification
     
     return {
-        \"message\": \"Appointment cancelled successfully\",
-        \"appointment_id\": appointment_id
+        message: Appointment cancelled successfully,
+        appointment_id: appointment_id
     }
