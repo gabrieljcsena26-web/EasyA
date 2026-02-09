@@ -17,6 +17,10 @@ export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const token = localStorage.getItem('token');
   const estId = user.establishment_id;
+  
+  console.log('Dashboard loaded. User:', user);
+  console.log('Token:', token ? 'Present' : 'Missing');
+  console.log('Establishment ID:', estId);
 
   useEffect(() => {
     if (estId) {
