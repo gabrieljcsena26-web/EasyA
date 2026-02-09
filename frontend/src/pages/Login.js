@@ -19,13 +19,19 @@ export default function Login({ setToken }) {
         ? { email, password, full_name: fullName, establishment_name: establishmentName, establishment_slug: slug }
         : { email, password };
       
+      console.log('Sending auth request to:', `${API_URL}${endpoint}`);
       const response = await axios.post(`${API_URL}${endpoint}`, data);
+      console.log('Auth response:', response.data);
+      
       localStorage.setItem('token', response.data.access_token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       setToken(response.data.access_token);
+      
+      console.log('Redirecting to dashboard...');
       window.location.href = '/dashboard';
     } catch (error) {
-      alert(error.response?.data?.detail || 'Authentication failed');
+      console.error('Auth error:', error);
+      alert(error.response?.data?.detail || 'Authentication failed. Check console.');
     }
   };
 
