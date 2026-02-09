@@ -30,8 +30,8 @@ class Settings(BaseSettings):
     REDIS_URL: str = Field(default="redis://localhost:6379/0", env="REDIS_URL")
     
     # CORS
-    FRONTEND_URLS: List[str] = Field(
-        default=["http://localhost:3000", "http://localhost:5173"],
+    FRONTEND_URLS: str = Field(
+        default="http://localhost:3000,http://localhost:5173",
         env="FRONTEND_URLS"
     )
     BOOKING_PUBLIC_BASE_URL: str = Field(
@@ -43,11 +43,9 @@ class Settings(BaseSettings):
         env="API_PUBLIC_BASE_URL"
     )
     
-    @validator('FRONTEND_URLS', pre=True)
-    def parse_frontend_urls(cls, v):
-        if isinstance(v, str):
-            return [url.strip() for url in v.split(',')]
-        return v
+    def get_frontend_urls(self) -> List[str]:
+        """Get frontend URLs as list."""
+        return [url.strip() for url in self.FRONTEND_URLS.split(',')]
     
     # WhatsApp - Meta Cloud API (NOT Twilio)
     WHATSAPP_PHONE_NUMBER_ID: str = Field(default="", env="WHATSAPP_PHONE_NUMBER_ID")
