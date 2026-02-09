@@ -383,7 +383,7 @@ def create_booking(
     db.commit()
     db.refresh(appointment)
     
-    logger.info(f"Appointment created: {appointment.id} for {booking.customer_name})\n    
+    logger.info(f"Appointment created: {appointment.id} for {booking.customer_name}")\n    
     # TODO: Schedule confirmation notifications via Celery
     
     return {
