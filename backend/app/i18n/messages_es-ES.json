@@ -1,0 +1,11 @@
+{
+  "confirmacao": "Hola {nome}, confirma tu cita de mañana a las {hora}. Si necesitas cancelar, responde 1.",
+  "lembrete": "¡Te veo hoy a las {hora}! Si necesitas cancelar, responde 1.",
+  "cancelado": "Tu cita ha sido cancelada con éxito.",
+  "vaga_liberada": "¡Hay un turno disponible hoy a las {hora} con nuestro profesional! Responde 1 para reservar.",
+  "erro_generico": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo.",
+  "sucesso_generico": "¡Operación realizada con éxito!",
+  "bem_vindo": "¡Bienvenido a EasyAgenda!",
+  "fatura_disponivel": "Tu factura está disponible para el pago.",
+  "notificacao_promocao": "¡Aprovecha nuestra promoción especial!"
+}
