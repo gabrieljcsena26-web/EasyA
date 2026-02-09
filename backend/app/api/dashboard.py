@@ -95,25 +95,25 @@ def get_dashboard_overview(
     ).count()
     
     return {
-        today: {
+        "today": {
             date: now.date().isoformat(),
             appointments: [
                 {
-                    id: apt.id,
-                    time: apt.start_time.strftime(%H:%M),
-                    customer_name: apt.customer_name,
-                    customer_phone: apt.customer_phone,
-                    service_id: apt.service_id,
-                    professional_id: apt.professional_id,
-                    status: apt.status.value,
-                    duration_minutes: int((apt.end_time - apt.start_time).total_seconds() / 60)
+                    "id": apt.id,
+                    "time": apt.start_time.strftime("%H:%M"),
+                    "customer_name": apt.customer_name,
+                    "customer_phone": apt.customer_phone,
+                    "service_id": apt.service_id,
+                    "professional_id": apt.professional_id,
+                    "status": apt.status.value,
+                    "duration_minutes": int((apt.end_time - apt.start_time).total_seconds() / 60)
                 }
                 for apt in today_appointments
             ],
-            count: len(today_appointments)
+            "count": len(today_appointments)
         },
         week_upcoming: week_appointments,
-        month: {
+        "month": {
             appointments: month_appointments,
             revenue: month_revenue
         },
@@ -177,21 +177,21 @@ def get_appointments(
     return {
         appointments: [
             {
-                id: apt.id,
-                start_time: apt.start_time.isoformat(),
-                end_time: apt.end_time.isoformat(),
-                customer_name: apt.customer_name,
-                customer_phone: apt.customer_phone,
-                customer_email: apt.customer_email,
-                service_id: apt.service_id,
-                professional_id: apt.professional_id,
-                status: apt.status.value,
-                notes: apt.notes,
-                created_at: apt.created_at.isoformat()
+                "id": apt.id,
+                "start_time": apt.start_time.isoformat(),
+                "end_time": apt.end_time.isoformat(),
+                "customer_name": apt.customer_name,
+                "customer_phone": apt.customer_phone,
+                "customer_email": apt.customer_email,
+                "service_id": apt.service_id,
+                "professional_id": apt.professional_id,
+                "status": apt.status.value,
+                "notes": apt.notes,
+                "created_at": apt.created_at.isoformat()
             }
             for apt in appointments
         ],
-        count: len(appointments)
+        "count": len(appointments)
     }
 
 
@@ -248,7 +248,7 @@ def search_customers(
     
     return {
         customers: result,
-        count: len(result)
+        "count": len(result)
     }
 
 
@@ -284,7 +284,7 @@ def get_customer_detail(
     ).order_by(Invoice.invoice_date.desc()).limit(20).all()
     
     return {
-        customer: {
+        "customer": {
             id: customer.id,
             name: customer.name,
             email: customer.email,
@@ -297,22 +297,22 @@ def get_customer_detail(
         },
         appointments: [
             {
-                id: apt.id,
-                start_time: apt.start_time.isoformat(),
-                service_id: apt.service_id,
-                professional_id: apt.professional_id,
-                status: apt.status.value
+                "id": apt.id,
+                "start_time": apt.start_time.isoformat(),
+                "service_id": apt.service_id,
+                "professional_id": apt.professional_id,
+                "status": apt.status.value
             }
             for apt in appointments
         ],
         invoices: [
             {
-                id: inv.id,
-                invoice_number: inv.invoice_number,
-                amount: inv.amount,
-                currency: inv.currency,
-                payment_status: inv.payment_status,
-                invoice_date: inv.invoice_date.isoformat()
+                "id": inv.id,
+                "invoice_number": inv.invoice_number,
+                "amount": inv.amount,
+                "currency": inv.currency,
+                "payment_status": inv.payment_status,
+                "invoice_date": inv.invoice_date.isoformat()
             }
             for inv in invoices
         ]
@@ -381,26 +381,26 @@ def get_monthly_report(
     
     return {
         month: month,
-        appointments: {
+        "appointments": {
             total: total_appointments,
             completed: completed,
             cancelled: cancelled,
             no_show: no_show,
             confirmed: total_appointments - completed - cancelled - no_show
         },
-        revenue: {
+        "revenue": {
             total: total_revenue,
             pending: pending_revenue,
             currency: USD  # TODO: Get from establishment
         },
         invoices: [
             {
-                id: inv.id,
-                invoice_number: inv.invoice_number,
-                amount: inv.amount,
-                payment_status: inv.payment_status,
-                invoice_date: inv.invoice_date.isoformat(),
-                pdf_url: inv.pdf_url
+                "id": inv.id,
+                "invoice_number": inv.invoice_number,
+                "amount": inv.amount,
+                "payment_status": inv.payment_status,
+                "invoice_date": inv.invoice_date.isoformat(),
+                "pdf_url": inv.pdf_url
             }
             for inv in invoices
         ]
