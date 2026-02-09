@@ -351,7 +351,7 @@ def create_booking(
     ).first()
     
     if existing:
-        logger.info(fDuplicate booking attempt detected: {idempotency_key})\n        return {
+        logger.info(f"Duplicate booking attempt detected: {idempotency_key})\n        return {
             "message": "Appointment already created",
             appointment: existing,
             duplicate: True
@@ -382,7 +382,7 @@ def create_booking(
     db.commit()
     db.refresh(appointment)
     
-    logger.info(fAppointment created: {appointment.id} for {booking.customer_name})\n    
+    logger.info(f"Appointment created: {appointment.id} for {booking.customer_name})\n    
     # TODO: Schedule confirmation notifications via Celery
     
     return {
@@ -431,7 +431,7 @@ def cancel_appointment(
     
     db.commit()
     
-    logger.info(fAppointment cancelled by customer: {appointment_id})
+    logger.info(f"Appointment cancelled by customer: {appointment_id}")
     
     # TODO: Send cancellation notification
     
