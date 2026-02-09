@@ -147,7 +147,7 @@ def get_availability(
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=Invalid date format. Use YYYY-MM-DD
+            detail="Invalid date format. Use YYYY-MM-DD"
         )
     
     # Initialize availability engine
