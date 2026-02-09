@@ -440,3 +440,35 @@ def cancel_appointment(
         "message": "Appointment cancelled successfully",
         appointment_id: appointment_id
     }
+
+
+from app.services.ics_generator import ICSGenerator
+from fastapi.responses import Response
+
+@router.get("/appointments/{appointment_id}/calendar.ics")
+def download_calendar(appointment_id: str, token: str, db: Session = Depends(get_db)):
+    """Download appointment as .ics calendar file."""
+    appointment = db.query(Appointment).filter(
+        and_(
+            Appointment.id == appointment_id,
+            Appointment.confirmation_token == token
+        )
+    ).first()
+    
+    if not appointment:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+    
+    apt_dict = {
+        "start_time": appointment.start_time,
+        "end_time": appointment.end_time,
+        "service_name": "Service",
+        "professional_name": "Professional"
+    }
+    
+    ics_content = ICSGenerator.generate_ics(apt_dict, {})
+    
+    return Response(
+        content=ics_content,
+        media_type="text/calendar",
+        headers={"Content-Disposition": f"attachment; filename=appointment-{appointment_id}.ics"}
+    )
