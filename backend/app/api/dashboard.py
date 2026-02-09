@@ -85,7 +85,7 @@ def get_dashboard_overview(
         and_(
             Invoice.establishment_id == establishment_id,
             Invoice.invoice_date >= month_start,
-            Invoice.payment_status == \"paid\"
+            Invoice.payment_status == paid
         )
     ).scalar() or 0.0
     
@@ -95,29 +95,29 @@ def get_dashboard_overview(
     ).count()
     
     return {
-        \"today\": {
-            \"date\": now.date().isoformat(),
-            \"appointments\": [
+        today: {
+            date: now.date().isoformat(),
+            appointments: [
                 {
-                    \"id\": apt.id,
-                    \"time\": apt.start_time.strftime(\"%H:%M\"),
-                    \"customer_name\": apt.customer_name,
-                    \"customer_phone\": apt.customer_phone,
-                    \"service_id\": apt.service_id,
-                    \"professional_id\": apt.professional_id,
-                    \"status\": apt.status.value,
-                    \"duration_minutes\": int((apt.end_time - apt.start_time).total_seconds() / 60)
+                    id: apt.id,
+                    time: apt.start_time.strftime(%H:%M),
+                    customer_name: apt.customer_name,
+                    customer_phone: apt.customer_phone,
+                    service_id: apt.service_id,
+                    professional_id: apt.professional_id,
+                    status: apt.status.value,
+                    duration_minutes: int((apt.end_time - apt.start_time).total_seconds() / 60)
                 }
                 for apt in today_appointments
             ],
-            \"count\": len(today_appointments)
+            count: len(today_appointments)
         },
-        \"week_upcoming\": week_appointments,
-        \"month\": {
-            \"appointments\": month_appointments,
-            \"revenue\": month_revenue
+        week_upcoming: week_appointments,
+        month: {
+            appointments: month_appointments,
+            revenue: month_revenue
         },
-        \"total_customers\": total_customers
+        total_customers: total_customers
     }
 
 
@@ -148,14 +148,14 @@ def get_appointments(
     # Date range filter
     if start_date:
         try:
-            start_dt = datetime.strptime(start_date, \"%Y-%m-%d\")
+            start_dt = datetime.strptime(start_date, %Y-%m-%d)
             query = query.filter(Appointment.start_time >= start_dt)
         except ValueError:
             pass
     
     if end_date:
         try:
-            end_dt = datetime.strptime(end_date, \"%Y-%m-%d\") + timedelta(days=1)
+            end_dt = datetime.strptime(end_date, %Y-%m-%d) + timedelta(days=1)
             query = query.filter(Appointment.start_time < end_dt)
         except ValueError:
             pass
@@ -175,23 +175,23 @@ def get_appointments(
     appointments = query.order_by(Appointment.start_time.desc()).limit(100).all()
     
     return {
-        \"appointments\": [
+        appointments: [
             {
-                \"id\": apt.id,
-                \"start_time\": apt.start_time.isoformat(),
-                \"end_time\": apt.end_time.isoformat(),
-                \"customer_name\": apt.customer_name,
-                \"customer_phone\": apt.customer_phone,
-                \"customer_email\": apt.customer_email,
-                \"service_id\": apt.service_id,
-                \"professional_id\": apt.professional_id,
-                \"status\": apt.status.value,
-                \"notes\": apt.notes,
-                \"created_at\": apt.created_at.isoformat()
+                id: apt.id,
+                start_time: apt.start_time.isoformat(),
+                end_time: apt.end_time.isoformat(),
+                customer_name: apt.customer_name,
+                customer_phone: apt.customer_phone,
+                customer_email: apt.customer_email,
+                service_id: apt.service_id,
+                professional_id: apt.professional_id,
+                status: apt.status.value,
+                notes: apt.notes,
+                created_at: apt.created_at.isoformat()
             }
             for apt in appointments
         ],
-        \"count\": len(appointments)
+        count: len(appointments)
     }
 
 
@@ -206,19 +206,19 @@ def search_customers(
     limit: int = Query(50, le=200),
     db: Session = Depends(get_db)
 ):
-    \"\"\"Search customers - EPIC SEARCH.
+    Search customers - EPIC SEARCH.
     
     Search by:
     - Name
     - Email
     - Phone
-    \"\"\"
+    
     query = db.query(Customer).filter(
         Customer.establishment_id == establishment_id
     )
     
     if search:
-        search_pattern = f\"%{search}%\"
+        search_pattern = f%{search}%
         query = query.filter(
             or_(
                 Customer.name.ilike(search_pattern),
@@ -237,18 +237,18 @@ def search_customers(
         ).count()
         
         result.append({
-            \"id\": customer.id,
-            \"name\": customer.name,
-            \"email\": customer.email,
-            \"phone\": customer.phone,
-            \"language\": customer.language,
-            \"appointment_count\": apt_count,
-            \"created_at\": customer.created_at.isoformat()
+            id: customer.id,
+            name: customer.name,
+            email: customer.email,
+            phone: customer.phone,
+            language: customer.language,
+            appointment_count: apt_count,
+            created_at: customer.created_at.isoformat()
         })
     
     return {
-        \"customers\": result,
-        \"count\": len(result)
+        customers: result,
+        count: len(result)
     }
 
 
@@ -258,7 +258,7 @@ def get_customer_detail(
     customer_id: str,
     db: Session = Depends(get_db)
 ):
-    \"\"\"Get customer details with appointment history.\"\"\"
+    Get customer details with appointment history.
     customer = db.query(Customer).filter(
         and_(
             Customer.id == customer_id,
@@ -270,7 +270,7 @@ def get_customer_detail(
         from fastapi import HTTPException, status
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=\"Customer not found\"
+            detail=Customer not found
         )
     
     # Get appointments
@@ -284,35 +284,35 @@ def get_customer_detail(
     ).order_by(Invoice.invoice_date.desc()).limit(20).all()
     
     return {
-        \"customer\": {
-            \"id\": customer.id,
-            \"name\": customer.name,
-            \"email\": customer.email,
-            \"phone\": customer.phone,
-            \"language\": customer.language,
-            \"notes\": customer.notes,
-            \"opt_out_whatsapp\": customer.opt_out_whatsapp,
-            \"opt_out_email\": customer.opt_out_email,
-            \"created_at\": customer.created_at.isoformat()
+        customer: {
+            id: customer.id,
+            name: customer.name,
+            email: customer.email,
+            phone: customer.phone,
+            language: customer.language,
+            notes: customer.notes,
+            opt_out_whatsapp: customer.opt_out_whatsapp,
+            opt_out_email: customer.opt_out_email,
+            created_at: customer.created_at.isoformat()
         },
-        \"appointments\": [
+        appointments: [
             {
-                \"id\": apt.id,
-                \"start_time\": apt.start_time.isoformat(),
-                \"service_id\": apt.service_id,
-                \"professional_id\": apt.professional_id,
-                \"status\": apt.status.value
+                id: apt.id,
+                start_time: apt.start_time.isoformat(),
+                service_id: apt.service_id,
+                professional_id: apt.professional_id,
+                status: apt.status.value
             }
             for apt in appointments
         ],
-        \"invoices\": [
+        invoices: [
             {
-                \"id\": inv.id,
-                \"invoice_number\": inv.invoice_number,
-                \"amount\": inv.amount,
-                \"currency\": inv.currency,
-                \"payment_status\": inv.payment_status,
-                \"invoice_date\": inv.invoice_date.isoformat()
+                id: inv.id,
+                invoice_number: inv.invoice_number,
+                amount: inv.amount,
+                currency: inv.currency,
+                payment_status: inv.payment_status,
+                invoice_date: inv.invoice_date.isoformat()
             }
             for inv in invoices
         ]
@@ -329,7 +329,7 @@ def get_monthly_report(
     month: str,  # YYYY-MM format
     db: Session = Depends(get_db)
 ):
-    \"\"\"Get monthly financial report - EPIC METRICS.
+    Get monthly financial report - EPIC METRICS.
     
     Returns:
     - Total revenue
@@ -337,7 +337,7 @@ def get_monthly_report(
     - Top services
     - Top professionals
     - Invoices
-    \"\"\"
+    
     try:
         year, month_num = map(int, month.split('-'))
         month_start = datetime(year, month_num, 1)
@@ -350,7 +350,7 @@ def get_monthly_report(
         from fastapi import HTTPException, status
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=\"Invalid month format. Use YYYY-MM\"
+            detail=Invalid month format. Use YYYY-MM
         )
     
     # Appointments stats
@@ -376,31 +376,31 @@ def get_monthly_report(
         )
     ).all()
     
-    total_revenue = sum(inv.amount for inv in invoices if inv.payment_status == \"paid\")
-    pending_revenue = sum(inv.amount for inv in invoices if inv.payment_status == \"pending\")
+    total_revenue = sum(inv.amount for inv in invoices if inv.payment_status == paid)
+    pending_revenue = sum(inv.amount for inv in invoices if inv.payment_status == pending)
     
     return {
-        \"month\": month,
-        \"appointments\": {
-            \"total\": total_appointments,
-            \"completed\": completed,
-            \"cancelled\": cancelled,
-            \"no_show\": no_show,
-            \"confirmed\": total_appointments - completed - cancelled - no_show
+        month: month,
+        appointments: {
+            total: total_appointments,
+            completed: completed,
+            cancelled: cancelled,
+            no_show: no_show,
+            confirmed: total_appointments - completed - cancelled - no_show
         },
-        \"revenue\": {
-            \"total\": total_revenue,
-            \"pending\": pending_revenue,
-            \"currency\": \"USD\"  # TODO: Get from establishment
+        revenue: {
+            total: total_revenue,
+            pending: pending_revenue,
+            currency: USD  # TODO: Get from establishment
         },
-        \"invoices\": [
+        invoices: [
             {
-                \"id\": inv.id,
-                \"invoice_number\": inv.invoice_number,
-                \"amount\": inv.amount,
-                \"payment_status\": inv.payment_status,
-                \"invoice_date\": inv.invoice_date.isoformat(),
-                \"pdf_url\": inv.pdf_url
+                id: inv.id,
+                invoice_number: inv.invoice_number,
+                amount: inv.amount,
+                payment_status: inv.payment_status,
+                invoice_date: inv.invoice_date.isoformat(),
+                pdf_url: inv.pdf_url
             }
             for inv in invoices
         ]
