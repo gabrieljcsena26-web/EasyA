@@ -59,7 +59,7 @@ def get_establishment_by_slug(
     if not establishment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Establishment not found: {slug}"
+            detail="f"Establishment not found: {slug}""
         )
     
     # Check trial status
@@ -156,7 +156,7 @@ def get_availability(
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail="str(e)"
         )
     
     # Get available slots
@@ -170,7 +170,7 @@ def get_availability(
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail="str(e)"
         )
     
     available_count = sum(1 for slot in slots if slot['available'])
@@ -202,7 +202,7 @@ def get_availability_summary(
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=Invalid date format. Use YYYY-MM-DD
+            detail="Invalid date format. Use YYYY-MM-DD"
         )
     
     # Initialize availability engine
@@ -211,7 +211,7 @@ def get_availability_summary(
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail="str(e)"
         )
     
     # Get summary
@@ -225,7 +225,7 @@ def get_availability_summary(
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail="str(e)"
         )
     
     return {
@@ -258,7 +258,7 @@ def create_booking(
     if not establishment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=Establishment not found
+            detail="Establishment not found"
         )
     
     # Check trial status
@@ -277,7 +277,7 @@ def create_booking(
     if not service:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=Service not found
+            detail="Service not found"
         )
     
     professional = db.query(Professional).filter(
@@ -286,7 +286,7 @@ def create_booking(
     if not professional:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=Professional not found
+            detail="Professional not found"
         )
     
     # Calculate end time
@@ -420,7 +420,7 @@ def cancel_appointment(
     if not appointment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=Appointment not found or invalid token
+            detail="Appointment not found or invalid token"
         )
     
     if appointment.status == AppointmentStatus.CANCELLED:
