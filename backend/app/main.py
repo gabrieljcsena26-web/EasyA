@@ -100,9 +100,10 @@ async def ping():
 async def health_db():
     """Database health check."""
     from app.core.database import engine
+    from sqlalchemy import text
     try:
         with engine.connect() as conn:
-            conn.execute("SELECT 1")
+            conn.execute(text("SELECT 1"))
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
         return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
