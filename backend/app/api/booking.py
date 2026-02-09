@@ -59,7 +59,7 @@ def get_establishment_by_slug(
     if not establishment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="f"Establishment not found: {slug}""
+            detail=f"Establishment not found: {slug}"
         )
     
     # Check trial status
