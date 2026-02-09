@@ -125,12 +125,12 @@ class AvailabilityEngine:
             min_booking_time = now + timedelta(hours=self.min_lead_hours)
             if current_dt < min_booking_time:
                 is_available = False
-                reason = \"too_soon\"
+                reason = too_soon
             
             # Apply quiet hours policy
             if self._is_in_quiet_hours(current_dt.time()):
                 is_available = False
-                reason = \"quiet_hours\"
+                reason = quiet_hours
             
             slots.append({
                 'time': current_dt.strftime('%H:%M'),
@@ -266,12 +266,12 @@ class AvailabilityEngine:
         # Check overlap with breaks
         for break_start, break_end in breaks:
             if self._overlaps(slot_start, slot_end, break_start, break_end):
-                return False, \"break\"
+                return False, break
         
         # Check overlap with existing appointments
         for apt_start, apt_end in appointments:
             if self._overlaps(slot_start, slot_end, apt_start, apt_end):
-                return False, \"booked\"
+                return False, booked
         
         return True, None
     
