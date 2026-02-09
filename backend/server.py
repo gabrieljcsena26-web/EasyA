@@ -11,6 +11,7 @@ from services.database import Database, get_database
 from middleware import setup_middleware
 from utils.logging import setup_logging
 from utils.errors import DomainError
+from api import auth_router
 
 # Setup logging
 setup_logging(settings.LOG_LEVEL)
