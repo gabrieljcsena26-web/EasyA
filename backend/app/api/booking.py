@@ -343,7 +343,7 @@ def create_booking(
         db.flush()
     
     # Create appointment with idempotency key
-    idempotency_key = f{establishment_id}:{booking.customer_phone}:{booking.start_time.isoformat()}
+    idempotency_key = f"{establishment_id}:{booking.customer_phone}:{booking.start_time.isoformat()}"
     
     # Check if already exists (idempotency)
     existing = db.query(Appointment).filter(
