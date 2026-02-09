@@ -34,8 +34,14 @@ class Settings(BaseSettings):
         default=["http://localhost:3000", "http://localhost:5173"],
         env="FRONTEND_URLS"
     )
-    BOOKING_PUBLIC_BASE_URL: str = Field(..., env="BOOKING_PUBLIC_BASE_URL")
-    API_PUBLIC_BASE_URL: str = Field(..., env="API_PUBLIC_BASE_URL")
+    BOOKING_PUBLIC_BASE_URL: str = Field(
+        default="http://localhost:3000",
+        env="BOOKING_PUBLIC_BASE_URL"
+    )
+    API_PUBLIC_BASE_URL: str = Field(
+        default="http://localhost:8001",
+        env="API_PUBLIC_BASE_URL"
+    )
     
     @validator('FRONTEND_URLS', pre=True)
     def parse_frontend_urls(cls, v):
