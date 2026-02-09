@@ -329,7 +329,7 @@ def get_monthly_report(
     month: str,  # YYYY-MM format
     db: Session = Depends(get_db)
 ):
-    """Get monthly financial report - EPIC METRICS."""
+    """Get monthly financial report - EPIC METRICS.
     
     Returns:
     - Total revenue
@@ -337,7 +337,7 @@ def get_monthly_report(
     - Top services
     - Top professionals
     - Invoices
-    
+    """
     try:
         year, month_num = map(int, month.split('-'))
         month_start = datetime(year, month_num, 1)
