@@ -392,14 +392,14 @@ def create_booking(
             id: appointment.id,
             service: service.name,
             professional: professional.name,
-            start_time: appointment.start_time.isoformat(),
-            end_time: appointment.end_time.isoformat(),
-            confirmation_token: appointment.confirmation_token,
+            "start_time": appointment.start_time.isoformat(),
+            "end_time": appointment.end_time.isoformat(),
+            "confirmation_token": appointment.confirmation_token,
         },
-        actions: {
-            calendar_download: f/api/appointments/{appointment.id}/calendar.ics?token={appointment.confirmation_token},
-            cancel: f/api/appointments/{appointment.id}/cancel?token={appointment.confirmation_token},
-            reschedule: f/api/appointments/{appointment.id}/reschedule?token={appointment.confirmation_token}
+        "actions": {
+            "calendar_download": f"/api/appointments/{appointment.id}/calendar.ics?token={appointment.confirmation_token}",
+            "cancel": f"/api/appointments/{appointment.id}/cancel?token={appointment.confirmation_token}",
+            "reschedule": f"/api/appointments/{appointment.id}/reschedule?token={appointment.confirmation_token}"
         }
     }
 
