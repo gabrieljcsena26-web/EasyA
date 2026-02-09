@@ -268,7 +268,7 @@ def create_booking(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
             detail={
                 code: TRIAL_EXPIRED,
-                message: Booking is currently unavailable. Please try again later.
+                "message": "Booking is currently unavailable. Please try again later."
             }
         )
     
@@ -316,7 +316,7 @@ def create_booking(
             status_code=status.HTTP_409_CONFLICT,
             detail={
                 code: SLOT_UNAVAILABLE,
-                message: This time slot is no longer available. Please choose another.
+                "message": "This time slot is no longer available. Please choose another."
             }
         )
     
@@ -352,7 +352,7 @@ def create_booking(
     
     if existing:
         logger.info(fDuplicate booking attempt detected: {idempotency_key})\n        return {
-            message: Appointment already created,
+            "message": "Appointment already created",
             appointment: existing,
             duplicate: True
         }
@@ -386,7 +386,7 @@ def create_booking(
     # TODO: Schedule confirmation notifications via Celery
     
     return {
-        message: Appointment confirmed successfully!,
+        "message": "Appointment confirmed successfully!",
         appointment: {
             id: appointment.id,
             service: service.name,
@@ -424,7 +424,7 @@ def cancel_appointment(
         )
     
     if appointment.status == AppointmentStatus.CANCELLED:
-        return {message: Appointment already cancelled}
+        return {"message": "Appointment already cancelled"}
     
     appointment.status = AppointmentStatus.CANCELLED
     appointment.updated_at = utcnow()
@@ -436,6 +436,6 @@ def cancel_appointment(
     # TODO: Send cancellation notification
     
     return {
-        message: Appointment cancelled successfully,
+        "message": "Appointment cancelled successfully",
         appointment_id: appointment_id
     }
