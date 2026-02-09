@@ -351,10 +351,11 @@ def create_booking(
     ).first()
     
     if existing:
-        logger.info(f"Duplicate booking attempt detected: {idempotency_key})\n        return {
+        logger.info(f"Duplicate booking attempt detected: {idempotency_key}")
+        return {
             "message": "Appointment already created",
-            appointment: existing,
-            duplicate: True
+            "appointment": existing,
+            "duplicate": True
         }
     
     # Create appointment
