@@ -112,17 +112,14 @@ async def health_db():
 # INCLUDE API ROUTERS
 # ============================================
 
-# Import routers (will create these next)
-# from app.api import auth, admin, booking, dashboard, billing, whatsapp, imports
-# app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-# app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
-# app.include_router(booking.router, prefix="/api/booking", tags=["booking"])
-# app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
-# app.include_router(billing.router, prefix="/api/billing", tags=["billing"])
-# app.include_router(whatsapp.router, prefix="/api/whatsapp", tags=["whatsapp"])
-# app.include_router(imports.router, prefix="/api/imports", tags=["imports"])
+from app.api import admin, booking, auth, dashboard
 
-logger.info("FastAPI app initialized")
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
+app.include_router(booking.router, prefix="/api/booking", tags=["booking"])
+app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
+
+logger.info("✅ All API routers loaded")
 
 
 # For supervisor compatibility
