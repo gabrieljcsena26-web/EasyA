@@ -148,14 +148,14 @@ def get_appointments(
     # Date range filter
     if start_date:
         try:
-            start_dt = datetime.strptime(start_date, %Y-%m-%d)
+            start_dt = datetime.strptime(start_date, "%Y-%m-%d")
             query = query.filter(Appointment.start_time >= start_dt)
         except ValueError:
             pass
     
     if end_date:
         try:
-            end_dt = datetime.strptime(end_date, %Y-%m-%d) + timedelta(days=1)
+            end_dt = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
             query = query.filter(Appointment.start_time < end_dt)
         except ValueError:
             pass
