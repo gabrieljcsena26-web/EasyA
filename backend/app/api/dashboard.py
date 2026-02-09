@@ -218,7 +218,7 @@ def search_customers(
     )
     
     if search:
-        search_pattern = f%{search}%
+        search_pattern = f"%{search}%
         query = query.filter(
             or_(
                 Customer.name.ilike(search_pattern),
