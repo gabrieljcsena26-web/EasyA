@@ -206,7 +206,7 @@ def search_customers(
     limit: int = Query(50, le=200),
     db: Session = Depends(get_db)
 ):
-    Search customers - EPIC SEARCH.
+    """Search customers - EPIC SEARCH."""
     
     Search by:
     - Name
@@ -258,7 +258,7 @@ def get_customer_detail(
     customer_id: str,
     db: Session = Depends(get_db)
 ):
-    Get customer details with appointment history.
+    """Get customer details with appointment history."""
     customer = db.query(Customer).filter(
         and_(
             Customer.id == customer_id,
@@ -329,7 +329,7 @@ def get_monthly_report(
     month: str,  # YYYY-MM format
     db: Session = Depends(get_db)
 ):
-    Get monthly financial report - EPIC METRICS.
+    """Get monthly financial report - EPIC METRICS."""
     
     Returns:
     - Total revenue
