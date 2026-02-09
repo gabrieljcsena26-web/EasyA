@@ -97,8 +97,9 @@ export default function Login({ setToken }) {
         </form>
         
         <button
+          type="button"
           onClick={() => setIsSignup(!isSignup)}
-          className="w-full mt-4 text-blue-600 hover:underline"
+          className="w-full mt-4 text-blue-600 hover:underline text-center"
         >
           {isSignup ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
         </button>
