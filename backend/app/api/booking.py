@@ -410,7 +410,7 @@ def cancel_appointment(
     token: str,
     db: Session = Depends(get_db)
 ):
-    Cancel appointment (customer self-service).
+    """Cancel appointment (customer self-service)."""
     appointment = db.query(Appointment).filter(
         and_(
             Appointment.id == appointment_id,
