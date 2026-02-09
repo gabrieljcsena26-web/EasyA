@@ -206,13 +206,13 @@ def search_customers(
     limit: int = Query(50, le=200),
     db: Session = Depends(get_db)
 ):
-    """Search customers - EPIC SEARCH."""
+    """Search customers - EPIC SEARCH.
     
     Search by:
     - Name
     - Email
     - Phone
-    
+    """
     query = db.query(Customer).filter(
         Customer.establishment_id == establishment_id
     )
