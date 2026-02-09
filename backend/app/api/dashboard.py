@@ -350,7 +350,7 @@ def get_monthly_report(
         from fastapi import HTTPException, status
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=Invalid month format. Use YYYY-MM
+            detail="Invalid month format. Use YYYY-MM"
         )
     
     # Appointments stats
