@@ -1,0 +1,12 @@
+{
+  "name": "easya-agenda",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend_v2 run dev",
+    "build": "npm --prefix frontend_v2 run build",
+    "preview": "npm --prefix frontend_v2 run preview",
+    "dev:all": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/dev-start.ps1",
+    "test:e2e": "npm --prefix e2e run test",
+    "test:e2e:headed": "npm --prefix e2e run test:headed"
+  }
+}

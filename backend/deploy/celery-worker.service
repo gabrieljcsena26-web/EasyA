@@ -1,0 +1,16 @@
+[Unit]
+Description=Celery Worker for EasyA
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/easya-backend
+Environment="ENV=production"
+Environment="REDIS_URL=redis://localhost:6379/0"
+ExecStart=/opt/easya-backend/venv/bin/celery -A app.celery_app.celery_app worker --loglevel=info --concurrency=4
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

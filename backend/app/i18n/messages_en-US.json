@@ -1,0 +1,11 @@
+{
+  "confirmacao": "Hello {nome}, please confirm your appointment tomorrow at {hora}. If you need to cancel, reply 1.",
+  "lembrete": "See you today at {hora}! If you need to cancel, reply 1.",
+  "cancelado": "Your appointment has been successfully canceled.",
+  "vaga_liberada": "A slot is now available today at {hora} with our professional. Reply 1 to book!",
+  "erro_generico": "An unexpected error occurred. Please try again.",
+  "sucesso_generico": "Operation completed successfully!",
+  "bem_vindo": "Welcome to EasyAgenda!",
+  "fatura_disponivel": "Your invoice is available for payment.",
+  "notificacao_promocao": "Enjoy our special promotion!"
+}

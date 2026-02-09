@@ -1,0 +1,13 @@
+.app-header{
+  height:64px;
+  background:linear-gradient(90deg,#0f1724,#111827 60%);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  font-weight:700;
+  border-radius:12px;
+}
+.header-left{font-size:18px}
+.header-right{font-size:13px;opacity:0.9}

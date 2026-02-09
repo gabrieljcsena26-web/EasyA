@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mockup Dashboard EasyAgenda</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f7;
+    }
+    .page {
+      max-width: 1180px;
+      margin: 20px auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      padding: 20px 24px 28px;
+      box-sizing: border-box;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand-logo {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#ffb6c1,#ff7f7f);
+    }
+    .brand-name {
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .user {
+      font-size: 13px;
+      color: #555;
+    }
+    .user span {
+      font-weight: 600;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0 16px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .date-range {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 12px;
+    }
+    select {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 12px;
+      background: #fff;
+    }
+    .view-buttons {
+      display: flex;
+      gap: 4px;
+    }
+    .view-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #ccc;
+      background: #fff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .view-btn.active {
+      background: #42b883;
+      border-color: #42b883;
+      color: #fff;
+    }
+    .summary {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .card {
+      flex: 1;
+      min-width: 160px;
+      background: #fafafa;
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px solid #eee;
+      font-size: 12px;
+    }
+    .card-title {
+      font-size: 11px;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .card-value {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .card-note {
+      font-size: 11px;
+      color: #777;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .side-panel {
+      background: #fafafa;
+      border-radius: 10px;
+      border: 1px solid #eee;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .side-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    .mini-calendar {
+      margin-bottom: 8px;
+    }
+    .mini-calendar table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      text-align: center;
+    }
+    .mini-calendar th {
+      font-weight: 600;
+      color: #777;
+      padding-bottom: 4px;
+    }
+    .mini-calendar td {
+      padding: 3px 0;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .mini-calendar td.free {
+      background: #e9f9f1;
+      color: #157347;
+    }
+    .mini-calendar td.busy {
+      background: #ffecec;
+      color: #b02a37;
+    }
+    .mini-calendar td.selected {
+      background: #42b883;
+      color: #fff;
+      font-weight: 600;
+    }
+    .side-legend {
+      font-size: 11px;
+      color: #666;
+      margin-top: 6px;
+    }
+    .side-legend span {
+      display: inline-block;
+      margin-right: 8px;
+    }
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 3px;
+    }
+    .dot-free { background:#42b883; }
+    .dot-busy { background:#b02a37; }
+
+    .next-block {
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    .next-item {
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .next-item:last-child {
+      border-bottom: none;
+    }
+    .next-time {
+      font-weight: 600;
+    }
+    .next-name {
+      font-weight: 600;
+    }
+    .next-service {
+      color: #555;
+    }
+    .next-status {
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-left: 4px;
+    }
+    .status-confirmed {
+      background: #e9f9f1;
+      color: #157347;
+    }
+    .status-pending {
+      background: #fff8e1;
+      color: #8a6d3b;
+    }
+
+    .main-panel {
+      background: #fafafa;
+      border-radius: 10px;
+      border: 1px solid #eee;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .main-header-title {
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .tag.active {
+      background: #42b883;
+      border-color: #42b883;
+      color: #fff;
+    }
+    table.agenda {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 12px;
+    }
+    table.agenda thead {
+      background: #f0f0f0;
+    }
+    table.agenda th,
+    table.agenda td {
+      padding: 6px 4px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+    table.agenda th {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #666;
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .st-created { background:#e0f0ff; color:#0d6efd; }
+    .st-waiting { background:#fff8e1; color:#8a6d3b; }
+    .st-confirmed { background:#e9f9f1; color:#157347; }
+    .st-cancelled { background:#ffecec; color:#b02a37; }
+    .st-noshow { background:#fce4ec; color:#ad1457; }
+
+    .row-actions {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .row-btn {
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #ccc;
+      background: #fff;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .row-btn.primary {
+      border-color: #42b883;
+      color: #157347;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-name">EasyAgenda • Ana Beleza</div>
+      </div>
+      <div class="user">
+        Logado como <span>Ana (dona)</span>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="date-range">Hoje • Quinta, 09 de Janeiro de 2026</div>
+      <div class="filters">
+        <div>
+          Profissional:
+          <select>
+            <option>Todos</option>
+            <option>Ana</option>
+            <option>Júlia</option>
+            <option>Pedro</option>
+          </select>
+        </div>
+        <div>
+          Status:
+          <select>
+            <option>Todos</option>
+            <option>Aguardando confirmação</option>
+            <option>Confirmados</option>
+            <option>Cancelados</option>
+            <option>Não compareceu</option>
+          </select>
+        </div>
+        <div class="view-buttons">
+          <button class="view-btn active">Dia</button>
+          <button class="view-btn">Semana</button>
+          <button class="view-btn">Mês</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="card">
+        <div class="card-title">Atendimentos de hoje</div>
+        <div class="card-value">8</div>
+        <div class="card-note">5 confirmados • 2 aguardando • 1 cancelado</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Taxa de comparecimento (30 dias)</div>
+        <div class="card-value">92%</div>
+        <div class="card-note">Melhor que em dezembro (89%)</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Faturamento estimado hoje</div>
+        <div class="card-value">R$ 1.240</div>
+        <div class="card-note">Baseado nos serviços agendados</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- COLUNA ESQUERDA: visão rápida -->
+      <div class="side-panel">
+        <div class="side-title">Visão rápida</div>
+        <div class="mini-calendar">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:4px;">
+            <span>Janeiro 2026</span>
+            <span style="color:#777;">&lt; &gt;</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>D</th><th>S</th><th>T</th><th>Q</th><th>Q</th><th>S</th><th>S</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td><td></td><td class="free">1</td><td class="free">2</td><td class="busy">3</td><td class="free">4</td><td class="busy">5</td>
+              </tr>
+              <tr>
+                <td class="free">6</td><td class="selected">7</td><td class="free">8</td><td class="busy">9</td><td class="free">10</td><td class="free">11</td><td class="busy">12</td>
+              </tr>
+              <tr>
+                <td class="free">13</td><td class="free">14</td><td class="busy">15</td><td class="free">16</td><td class="free">17</td><td class="busy">18</td><td class="free">19</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="side-legend">
+          <span><span class="dot dot-free"></span>Vagas livres</span>
+          <span><span class="dot dot-busy"></span>Cheio/quase cheio</span>
+        </div>
+
+        <div class="next-block">
+          <div class="side-title">Próximos horários de hoje</div>
+          <div class="next-item">
+            <div><span class="next-time">09:00</span> • <span class="next-name">Maria Oliveira</span></div>
+            <div class="next-service">Corte feminino • Ana
+              <span class="next-status status-confirmed">Confirmado</span>
+            </div>
+          </div>
+          <div class="next-item">
+            <div><span class="next-time">10:30</span> • <span class="next-name">João Silva</span></div>
+            <div class="next-service">Manicure • Júlia
+              <span class="next-status status-pending">Aguardando</span>
+            </div>
+          </div>
+          <div class="next-item">
+            <div><span class="next-time">14:00</span> • <span class="next-name">Carla Souza</span></div>
+            <div class="next-service">Tintura • Ana
+              <span class="next-status status-confirmed">Confirmado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUNA DIREITA: tabela de agendamentos -->
+      <div class="main-panel">
+        <div class="main-header">
+          <div class="main-header-title">Agenda de hoje (08 agendamentos)</div>
+          <div class="tags">
+            <div class="tag active">Todos</div>
+            <div class="tag">Só pendentes</div>
+            <div class="tag">Só confirmados</div>
+            <div class="tag">Cancelados / no-show</div>
+          </div>
+        </div>
+
+        <table class="agenda">
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th>Cliente</th>
+              <th>Serviço</th>
+              <th>Profissional</th>
+              <th>Status</th>
+              <th>Canal</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>09:00</td>
+              <td>Maria Oliveira<br/><span style="font-size:11px;color:#777;">+55 11 9 9999-0001</span></td>
+              <td>Corte feminino</td>
+              <td>Ana</td>
+              <td><span class="status-pill st-confirmed">Confirmado</span></td>
+              <td style="font-size:11px;">WhatsApp (bot)</td>
+              <td>
+                <div class="row-actions">
+                  <button class="row-btn">Ver detalhes</button>
+                  <button class="row-btn">Remarcar</button>
+                  <button class="row-btn">Cancelar</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>10:30</td>
+              <td>João Silva<br/><span style="font-size:11px;color:#777;">+55 11 9 9999-0002</span></td>
+              <td>Manicure</td>
+              <td>Júlia</td>
+              <td><span class="status-pill st-waiting">Aguard. confirmação</span></td>
+              <td style="font-size:11px;">Link landing</td>
+              <td>
+                <div class="row-actions">
+                  <button class="row-btn primary">Confirmar manual</button>
+                  <button class="row-btn">Enviar lembrete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>11:30</td>
+              <td>Pedro Lima<br/><span style="font-size:11px;color:#777;">+55 11 9 9999-0003</span></td>
+              <td>Corte masculino</td>
+              <td>Pedro</td>
+              <td><span class="status-pill st-created">Criado</span></td>
+              <td style="font-size:11px;">WhatsApp (manual)</td>
+              <td>
+                <div class="row-actions">
+                  <button class="row-btn primary">Confirmar</button>
+                  <button class="row-btn">Editar</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>14:00</td>
+              <td>Carla Souza<br/><span style="font-size:11px;color:#777;">+55 11 9 9999-0004</span></td>
+              <td>Tintura</td>
+              <td>Ana</td>
+              <td><span class="status-pill st-confirmed">Confirmado</span></td>
+              <td style="font-size:11px;">WhatsApp (bot)</td>
+              <td>
+                <div class="row-actions">
+                  <button class="row-btn">Remarcar</button>
+                  <button class="row-btn">Marcar como no-show</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>15:30</td>
+              <td>Luiza Prado<br/><span style="font-size:11px;color:#777;">+55 11 9 9999-0005</span></td>
+              <td>Escova</td>
+              <td>Júlia</td>
+              <td><span class="status-pill st-cancelled">Cancelado</span></td>
+              <td style="font-size:11px;">Link landing</td>
+              <td>
+                <div class="row-actions">
+                  <button class="row-btn">Ver motivo</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>17:00</td>
+              <td>Bruno Alves<br/><span style="font-size:11px;color:#777;">+55 11 9 9999-0006</span></td>
+              <td>Corte masculino</td>
+              <td>Pedro</td>
+              <td><span class="status-pill st-noshow">Não compareceu</span></td>
+              <td style="font-size:11px;">WhatsApp (bot)</td>
+              <td>
+                <div class="row-actions">
+                  <button class="row-btn">Reagendar</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>

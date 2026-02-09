@@ -1,0 +1,16 @@
+{
+  "confirmacao": "Olá {nome}, confirme sua presença amanhã na sua consulta às {hora}. Se precisar cancelar, responda 1.",
+  "pre_confirmacao": "Olá {nome}, recebemos seu pedido de agendamento para {hora}. Você vai receber a confirmação oficial via SMS {quando}. Após essa mensagem, você terá {janela_h}h para responder e manter o horário.",
+  "confirmacao_oficial_sem_deposito": "Olá {nome}, para confirmar seu agendamento de {hora}, responda: 1 CONFIRMAR | 2 REAGENDAR | 3 CANCELAR. Prazo até {prazo}. Sem resposta: cancelamento automático.",
+  "confirmacao_oficial_com_deposito": "Olá {nome}, para confirmar seu agendamento de {hora}, responda: 1 CONFIRMAR | 2 REAGENDAR | 3 CANCELAR. Prazo até {prazo}. Sem resposta: cancelamento automático e pode haver taxa de reserva conforme a política do sinal.",
+  "confirmacao_urgente_sem_deposito": "Olá {nome}, seu agendamento de {hora} precisa de confirmação. Responda: 1 CONFIRMAR | 2 REAGENDAR | 3 CANCELAR até {prazo}. Sem resposta: cancelamento automático.",
+  "confirmacao_urgente_com_deposito": "Olá {nome}, seu agendamento de {hora} precisa de confirmação. Responda: 1 CONFIRMAR | 2 REAGENDAR | 3 CANCELAR até {prazo}. Sem resposta: cancelamento automático e pode haver taxa de reserva conforme a política do sinal.",
+  "lembrete": "Te vejo hoje às {hora}! Se precisar cancelar, responda 1.",
+  "cancelado": "Seu agendamento foi cancelado com sucesso.",
+  "vaga_liberada": "Uma vaga foi liberada para hoje às {hora} com nosso profissional. Responda 1 para reservar!",
+  "erro_generico": "Ocorreu um erro inesperado. Por favor, tente novamente.",
+  "sucesso_generico": "Operação realizada com sucesso!",
+  "bem_vindo": "Bem-vindo à EasyAgenda!",
+  "fatura_disponivel": "Sua fatura está disponível para pagamento.",
+  "notificacao_promocao": "Aproveite nossa promoção especial!"
+}

@@ -1,0 +1,12 @@
+.app-sidebar{
+  width:270px;
+  background:transparent;
+  color:#111827;
+  min-height:calc(100vh - 64px);
+  padding-top:12px;
+}
+.card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(15,23,42,0.04)}
+.mini-calendar{padding:14px}
+.app-sidebar ul{list-style:none;padding:0;margin:0}
+.app-sidebar a{display:block;padding:8px 6px;color:#111827;text-decoration:underline}
+.app-sidebar a:hover{text-decoration:none;background:#f8fafc;border-radius:6px}

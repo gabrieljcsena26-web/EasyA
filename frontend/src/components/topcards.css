@@ -1,0 +1,5 @@
+.topcards{display:flex;gap:14px;margin:14px 0;align-items:stretch}
+.topcard{background:#ffffff;padding:20px;border-radius:12px;box-shadow:0 6px 18px rgba(15,23,42,0.06);min-width:160px;flex:1}
+.topcard-number{font-size:28px;font-weight:800;color:#0f1724}
+.topcard-label{font-size:13px;color:#6b7280;margin-top:8px}
+.topcard small{display:block;color:#9ca3af;margin-top:6px}

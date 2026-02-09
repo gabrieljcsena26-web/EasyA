@@ -1,0 +1,16 @@
+[Unit]
+Description=EasyAgenda Postgres backup
+After=network.target
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/easya-backend
+EnvironmentFile=-/opt/easya-backend/.env
+Environment=BACKUP_DIR=/var/backups/easya/postgres
+Environment=RETENTION_DAYS=14
+ExecStart=/usr/bin/env bash /opt/easya-backend/deploy/backup_postgres.sh
+
+[Install]
+WantedBy=multi-user.target

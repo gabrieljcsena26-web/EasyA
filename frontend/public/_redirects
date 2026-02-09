@@ -1,0 +1,3 @@
+# Cloudflare Pages / Netlify-style redirects
+# SPA fallback so deep links like /booking/<slug> work when opened directly.
+/*    /index.html   200

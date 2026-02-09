@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: easya
+      POSTGRES_USER: easya
+      POSTGRES_PASSWORD: easya
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U easya -d easya"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./Backend
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: postgresql://easya:easya@db:5432/easya
+      REDIS_URL: redis://redis:6379/0
+      # In production set these to your real domains
+      FRONTEND_URLS: http://localhost:3000
+      FRONTEND_BASE_URL: http://localhost:3000
+      BOOKING_PUBLIC_BASE_URL: http://localhost:3000
+      API_PUBLIC_BASE_URL: http://localhost:8000
+      MOCK_NOTIFICATIONS: "true"
+      # Configure também SECRET_KEY, OPENAI_API_KEY, TWILIO_* em produção
+    command: >-
+      sh -c "python -m scripts.wait_for_db ; python -m alembic upgrade head ;
+      uvicorn main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips=*"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2).read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  celery_worker:
+    build:
+      context: ./Backend
+    depends_on:
+      - redis
+      - db
+    environment:
+      DATABASE_URL: postgresql://easya:easya@db:5432/easya
+      REDIS_URL: redis://redis:6379/0
+      MOCK_NOTIFICATIONS: "true"
+    # Celery desativado por enquanto; manter contêiner inerte em ambiente local leve
+    command: sleep infinity
+
+  nginx:
+    image: nginx:stable
+    ports:
+      - "80:80"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
+

@@ -1,0 +1,16 @@
+[Unit]
+Description=EasyAgenda FastAPI Uvicorn service
+After=network.target easya-migrate.service
+Requires=easya-migrate.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/easya-backend
+EnvironmentFile=-/opt/easya-backend/.env
+ExecStart=/usr/bin/env /opt/easya-backend/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --workers 4 --proxy-headers --forwarded-allow-ips=*
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

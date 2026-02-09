@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EasyAgenda - Fallback Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>EasyAgenda - Fallback Dashboard</h1>
+    <div id="dev-token-area">
+      <label for="devtoken">Dev JWT:</label>
+      <input id="devtoken" placeholder="Cole o JWT aqui" style="width:60%" />
+      <button id="saveToken">Salvar</button>
+      <button id="clearToken">Limpar</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="controls">
+      <button id="loadConfig">Carregar /admin/config</button>
+      <button id="loadAppointments">Carregar /appointments</button>
+      <div id="status" class="muted">Pronto</div>
+    </section>
+
+    <section>
+      <h2>Config</h2>
+      <pre id="configOut">—</pre>
+    </section>
+
+    <section>
+      <h2>Appointments</h2>
+      <pre id="appointmentsOut">—</pre>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

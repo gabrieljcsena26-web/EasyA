@@ -1,0 +1,252 @@
+import React, { useEffect, useState } from 'react'
+
+function monthRange(year, month) {
+  const first = new Date(year, month, 1)
+  const last = new Date(year, month + 1, 0)
+  return { first, last }
+}
+
+function buildGrid(year, month) {
+  // returns array of weeks, each week is array of Date or null
+  // week starts on Monday for alignment with user's preference
+  const { first, last } = monthRange(year, month)
+  // convert JS Sunday=0..Saturday=6 to Monday-first (Monday=0..Sunday=6)
+  const startWeekDay = (first.getDay() + 6) % 7
+  const daysInMonth = last.getDate()
+  const cells = []
+  // leading blanks
+  for (let i = 0; i < startWeekDay; i++) cells.push(null)
+  for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d))
+  // trailing blanks to complete last week
+  while (cells.length % 7 !== 0) cells.push(null)
+  const weeks = []
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7))
+  return weeks
+}
+
+const MiniCalendar = ({ serviceId, professionalId, selectedDate, onSelectDate, onHoverDate }) => {
+  const today = selectedDate ? new Date(selectedDate) : new Date()
+  function toLocalISO(d = new Date()){
+    const dt = d instanceof Date ? d : new Date(d)
+    const y = dt.getFullYear()
+    const m = String(dt.getMonth() + 1).padStart(2,'0')
+    const day = String(dt.getDate()).padStart(2,'0')
+    return `${y}-${m}-${day}`
+  }
+  const [year, setYear] = useState(today.getFullYear())
+  const [month, setMonth] = useState(today.getMonth())
+  const [statesByDate, setStatesByDate] = useState({})
+  const cacheRef = React.useRef({})
+  const apiBase = (window.__API_URL__ || 'http://127.0.0.1:8000')
+
+  // seed a demo scenario into statesByDate and save demo appointments to localStorage
+  function seedScenario(size) {
+    const now = new Date()
+    const diffs = {
+      small: [2, 5],
+      medium: [1, 3, 5, 8],
+      large: [0, 1, 2, 3, 4, 5, 10, 15]
+    }[size] || [2, 5]
+
+    const demoStates = {}
+    const demoAppts = {}
+    diffs.forEach((off, idx) => {
+      const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate() + off)
+      const iso = toLocalISO(dt)
+      // determine state by index and size
+      let state = 'free'
+      let count = 1
+      if (size === 'large') { state = 'busy'; count = 6 }
+      else if (size === 'medium') { state = idx % 2 === 0 ? 'mid' : 'busy'; count = state === 'mid' ? 3 : 5 }
+      else { state = idx === 0 ? 'busy' : 'mid'; count = state === 'busy' ? 4 : 2 }
+
+      demoStates[iso] = { state, count }
+
+      demoAppts[iso] = Array.from({ length: count }).map((_, i) => ({
+        id: `demo-${size}-${iso}-${i + 1}`,
+        start_time: `${9 + (i % 8)}:00`,
+        customer_name: `Cliente ${size.toUpperCase()} ${i + 1}`,
+        customer_whatsapp: '',
+        service_name: i % 2 ? 'Coloração' : 'Corte',
+        professional_id: 1,
+        status: i % 3 === 0 ? 'Confirmado' : 'Aguardando',
+        date: iso
+      }))
+    })
+
+    setStatesByDate((prev) => ({ ...prev, ...demoStates }))
+    const key = `${year}-${month}`
+    cacheRef.current[key] = { ...(cacheRef.current[key] || {}), ...demoStates }
+
+    // merge with existing DEMO_APPTS
+    try {
+      const raw = localStorage.getItem('DEMO_APPTS')
+      const existing = raw ? JSON.parse(raw) : {}
+      const merged = { ...existing, ...demoAppts }
+      localStorage.setItem('DEMO_APPTS', JSON.stringify(merged))
+    } catch (e) {
+      console.warn('failed to set demo appts', e)
+    }
+  }
+
+  useEffect(() => {
+    async function loadOccupancy() {
+      try {
+        const key = `${year}-${month}`
+        if (cacheRef.current[key]) {
+          setStatesByDate(cacheRef.current[key])
+          return
+        }
+        const first = new Date(year, month, 1)
+        const last = new Date(year, month + 1, 0)
+        const from = toLocalISO(first)
+        const to = toLocalISO(last)
+        const url = new URL(apiBase + '/occupancy')
+        url.searchParams.set('from', from)
+        url.searchParams.set('to', to)
+        url.searchParams.set('service_id', serviceId || 1)
+        if (professionalId) url.searchParams.set('professional_id', professionalId)
+
+        const res = await fetch(url.toString())
+        if (!res.ok) return
+        const data = await res.json()
+        const map = {}
+        // backend expected shape: days: [{ date: 'YYYY-MM-DD', state: 'free'|'mid'|'busy', count: N }]
+        (data.days || []).forEach((d) => {
+          // normalize incoming date key to local-ISO to avoid timezone/format mismatches
+          const k = toLocalISO(d.date || d)
+          map[k] = { state: d.state, count: d.count || d.total || 0 }
+        })
+        // cache per month
+        cacheRef.current[key] = map
+        setStatesByDate(map)
+
+        // if backend returned no markers (or no busy/mid days), seed a small demo so the calendar looks realistic
+        const hasMarkers = Object.values(map).some(v => {
+          if (!v) return false
+          if (typeof v === 'string') return v === 'busy' || v === 'mid'
+          return v.state === 'busy' || v.state === 'mid'
+        })
+        if (!hasMarkers) {
+          try {
+            const raw = localStorage.getItem('DEMO_APPTS')
+            if (!raw) {
+              // no demo present -> seed a medium demo
+              seedScenario('medium')
+            } else {
+              // demo exists: reflect demo appointments into calendar states
+              const demo = JSON.parse(raw)
+              const demoStates = {}
+              Object.keys(demo).forEach((dkey) => {
+                const arr = demo[dkey] || []
+                const k = toLocalISO(dkey)
+                demoStates[k] = { state: arr.length > 4 ? 'busy' : arr.length > 1 ? 'mid' : 'free', count: arr.length }
+              })
+              setStatesByDate(prev => ({ ...prev, ...demoStates }))
+              cacheRef.current[key] = { ...(cacheRef.current[key] || {}), ...demoStates }
+            }
+          } catch (e) {
+            /* ignore */
+          }
+        }
+      } catch (e) {
+        console.error('mini calendar occupancy error', e)
+      }
+    }
+    loadOccupancy()
+  }, [year, month, serviceId, professionalId])
+
+  // listen for appointment loads and reflect them on the calendar
+  useEffect(() => {
+    function handler(e) {
+      try {
+        const { date, count } = e.detail || {}
+        if (!date) return
+        const k = toLocalISO(date)
+        const state = count > 4 ? 'busy' : count > 1 ? 'mid' : 'free'
+        setStatesByDate((prev) => ({ ...prev, [k]: { state, count } }))
+        const key = `${year}-${month}`
+        cacheRef.current[key] = { ...(cacheRef.current[key] || {}), [k]: { state, count } }
+      } catch (err) { /* ignore */ }
+    }
+    window.addEventListener('appointmentsLoaded', handler)
+    return () => window.removeEventListener('appointmentsLoaded', handler)
+  }, [year, month])
+
+  const weeks = buildGrid(year, month)
+
+  function handleDayClick(e, day) {
+    if (!day) return
+    const iso = toLocalISO(day)
+    // Ctrl+click toggles busy (high/red)
+    if (e.ctrlKey) {
+      setStatesByDate((prev) => ({ ...prev, [iso]: prev[iso] === 'busy' ? 'free' : 'busy' }))
+      return
+    }
+    // Shift+click toggles mid (yellow)
+    if (e.shiftKey) {
+      setStatesByDate((prev) => ({ ...prev, [iso]: prev[iso] === 'mid' ? 'free' : 'mid' }))
+      return
+    }
+    // Alt+click clears marker
+    if (e.altKey) {
+      setStatesByDate((prev) => ({ ...prev, [iso]: 'free' }))
+      return
+    }
+    // default behavior: select date for agenda
+    if (onSelectDate) onSelectDate(iso)
+  }
+
+  function prevMonth() { setMonth((m) => { if (m === 0) { setYear((y) => y - 1); return 11 } return m - 1 }) }
+  function nextMonth() { setMonth((m) => { if (m === 11) { setYear((y) => y + 1); return 0 } return m + 1 }) }
+
+  return (
+    <div className="mini-calendar">
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+        <div style={{fontWeight:700}}>{new Date(year, month).toLocaleString(undefined, {month: 'long', year: 'numeric'})}</div>
+        <div style={{display:'flex',gap:8}}>
+          <button className="action-btn" onClick={prevMonth} aria-label="Prev month">‹</button>
+          <button className="action-btn" onClick={nextMonth} aria-label="Next month">›</button>
+        </div>
+      </div>
+      <div className="weekdays" style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',color:'#9ca3af',fontSize:12,marginBottom:6}}>
+        {['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map((w) => <div key={w} style={{textAlign:'center'}}>{w}</div>)}
+      </div>
+      <div className="days" style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:8}}>
+        {weeks.flat().map((d, i) => {
+          if (!d) return <div key={i} className="day empty" aria-hidden="true"></div>
+          const iso = toLocalISO(d)
+          const info = statesByDate[iso] || { state: 'free', count: 0 }
+          const state = (typeof info === 'string') ? info : (info && info.state) ? info.state : 'free'
+          const count = (typeof info === 'object' && info && info.count) ? info.count : 0
+          const cls = state === 'free' ? 'day-low' : state === 'mid' ? 'day-mid' : 'day-high'
+          const isSelected = selectedDate === iso
+          return (
+            <button
+              key={i}
+              className={`day ${cls} ${isSelected ? 'selected' : ''}`}
+              onClick={(e) => handleDayClick(e, d)}
+              onMouseEnter={() => onHoverDate && onHoverDate(iso)}
+              onMouseLeave={() => onHoverDate && onHoverDate(null)}
+              onTouchStart={() => onHoverDate && onHoverDate(iso)}
+              onTouchEnd={() => onHoverDate && onHoverDate(null)}
+              onFocus={() => onHoverDate && onHoverDate(iso)}
+              onBlur={() => onHoverDate && onHoverDate(null)}
+              aria-pressed={isSelected}
+              title={`${state === 'busy' ? 'Cheio' : state === 'mid' ? 'Alguns' : 'Poucos'}\nClick: selecionar · Ctrl+click: marcar ocupado · Shift+click: marcar médio · Alt+click: limpar`}
+            >
+              {d.getDate()}
+            </button>
+          )
+        })}
+      </div>
+      <div className="legend">
+        <span><i className="dot green"></i> Poucos atendimentos</span>
+        <span><i className="dot yellow"></i> Alguns atendimentos</span>
+        <span><i className="dot red"></i> Muitos atendimentos</span>
+      </div>
+    </div>
+  )
+}
+
+export default MiniCalendar

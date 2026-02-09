@@ -1,0 +1,9 @@
+services:
+  nginx:
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx_api_tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certs/api.origin.pem:/etc/nginx/certs/origin.pem:ro
+      - ./certs/api.origin.key:/etc/nginx/certs/origin.key:ro

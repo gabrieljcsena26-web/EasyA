@@ -1,0 +1,15 @@
+[Unit]
+Description=EasyAgenda DB migrations (Alembic)
+After=network.target
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/easya-backend
+EnvironmentFile=-/opt/easya-backend/.env
+ExecStart=/usr/bin/env bash /opt/easya-backend/deploy/migrate.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
