@@ -1,89 +1,137 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
+"""EasyAgenda - Premium Appointment Booking SaaS"""
+from fastapi import FastAPI, APIRouter, status
+from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
-import os
+from contextlib import asynccontextmanager
 import logging
-from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
-from datetime import datetime, timezone
+import redis.asyncio as redis
+
+from config import settings
+from services.database import Database, get_database
+from middleware import setup_middleware
+from utils.logging import setup_logging
+from utils.errors import DomainError
+
+# Setup logging
+setup_logging(settings.LOG_LEVEL)
+logger = logging.getLogger(__name__)
 
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan manager."""
+    # Startup
+    logger.info("Starting EasyAgenda application...")
+    await Database.connect()
+    logger.info("EasyAgenda application started")
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down EasyAgenda application...")
+    await Database.disconnect()
+    logger.info("EasyAgenda application stopped")
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
-app = FastAPI()
+# Create FastAPI app
+app = FastAPI(
+    title="EasyAgenda API",
+    description="Premium Appointment Booking SaaS",
+    version="1.0.0",
+    lifespan=lifespan
+)
 
-# Create a router with the /api prefix
+# Create API router
 api_router = APIRouter(prefix="/api")
 
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+# ============================================
+# HEALTH ENDPOINTS
+# ============================================
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+@app.get("/health", status_code=status.HTTP_200_OK)
+async def health_check():
+    """Basic health check."""
+    return {
+        "status": "healthy",
+        "service": "easyagenda",
+        "version": "1.0.0"
+    }
 
-# Add your routes to the router instead of directly to app
+
+@api_router.get("/health/db", status_code=status.HTTP_200_OK)
+async def health_check_db():
+    """Database health check."""
+    try:
+        db = get_database()
+        # Simple ping to check connection
+        await db.command('ping')
+        return {
+            "status": "healthy",
+            "database": "connected"
+        }
+    except Exception as e:
+        logger.error(f"Database health check failed: {e}", exc_info=True)
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "status": "unhealthy",
+                "database": "disconnected",
+                "error": str(e)
+            }
+        )
+
+
+@api_router.get("/health/redis", status_code=status.HTTP_200_OK)
+async def health_check_redis():
+    """Redis health check."""
+    try:
+        client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+        await client.ping()
+        await client.close()
+        return {
+            "status": "healthy",
+            "redis": "connected"
+        }
+    except Exception as e:
+        logger.error(f"Redis health check failed: {e}", exc_info=True)
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "status": "unhealthy",
+                "redis": "disconnected",
+                "error": str(e)
+            }
+        )
+
+
+# ============================================
+# PLACEHOLDER ENDPOINTS (will be built in phases)
+# ============================================
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    """API root."""
+    return {
+        "message": "Welcome to EasyAgenda API",
+        "version": "1.0.0",
+        "docs": "/docs"
+    }
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
-
-# Include the router in the main app
+# Include API router
 app.include_router(api_router)
 
+# Setup CORS
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=settings.CORS_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Setup security middleware
+setup_middleware(app)
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+logger.info("EasyAgenda server initialized")
