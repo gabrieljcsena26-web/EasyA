@@ -83,13 +83,13 @@ class Settings(BaseSettings):
     PDF_COMPANY_INFO: Optional[str] = Field(default=None, env="PDF_COMPANY_INFO")
     
     # Cloudflare
-    ALLOWED_HOSTS: List[str] = Field(default=["*"], env="ALLOWED_HOSTS")
+    ALLOWED_HOSTS: str = Field(default="*", env="ALLOWED_HOSTS")
     
-    @validator('ALLOWED_HOSTS', pre=True)
-    def parse_allowed_hosts(cls, v):
-        if isinstance(v, str):
-            return [host.strip() for host in v.split(',')]
-        return v
+    def get_allowed_hosts(self) -> List[str]:
+        """Get allowed hosts as list."""
+        if self.ALLOWED_HOSTS == "*":
+            return ["*"]
+        return [host.strip() for host in self.ALLOWED_HOSTS.split(',')]
     
     class Config:
         env_file = ".env"
