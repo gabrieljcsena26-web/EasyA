@@ -6,6 +6,7 @@ Premium appointment booking SaaS with:
 - PDF invoice generation
 - Google Calendar import
 """
+from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
