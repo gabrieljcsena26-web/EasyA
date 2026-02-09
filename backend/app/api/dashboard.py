@@ -270,7 +270,7 @@ def get_customer_detail(
         from fastapi import HTTPException, status
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=Customer not found
+            detail="Customer not found"
         )
     
     # Get appointments
