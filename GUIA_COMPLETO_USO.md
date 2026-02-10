@@ -87,7 +87,7 @@ curl -X POST http://localhost:8001/api/auth/login \
 ```
 
 **Via Browser:**
-1. Acesse: https://schedule-fortress-1.preview.emergentagent.com/
+1. Acesse: https://agenda-app-demo.preview.emergentagent.com/
 2. Clique "Don't have an account? Sign Up"
 3. Preencha:
    - Full Name: Seu Nome

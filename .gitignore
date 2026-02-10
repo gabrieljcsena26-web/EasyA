@@ -12,3 +12,7 @@ frontend_old_backup/
 frontend_github_backup/
 .venv/
 venv/
+-e 
+# Environment files
+*.env
+*.env.*
